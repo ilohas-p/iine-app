@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ff5a5f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="いいね">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <title>いいね</title>
+  <style>
+    :root { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100dvh;
+      display: grid; place-items: center;
+      background: #f4f7fb;
+      padding: 24px;
+    }
+    main { text-align: center; width: 100%; }
+    h1 { font-size: 32px; color: #222; margin: 0 0 28px; }
+    button {
+      width: min(82vw, 360px);
+      aspect-ratio: 1 / 1;
+      border: 0; border-radius: 50%;
+      background: #ff5a5f; color: #fff;
+      font-size: clamp(42px, 12vw, 64px);
+      font-weight: 800;
+      box-shadow: 0 12px 28px rgba(0,0,0,.18);
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    button:active { transform: scale(.96); }
+    p { font-size: 18px; color: #555; margin-top: 24px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>いいねアプリ</h1>
+    <button id="likeButton" aria-label="いいねと言う">いいね</button>
+    <p>ボタンを押すと「いいね」と言います</p>
+  </main>
+
+  <script>
+    const button = document.getElementById('likeButton');
+    button.addEventListener('click', () => {
+      if (!('speechSynthesis' in window)) {
+        alert('この端末では音声読み上げに対応していません。');
+        return;
+      }
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance('いいね');
+      u.lang = 'ja-JP';
+      u.rate = 1.0;
+      u.pitch = 1.0;
+      speechSynthesis.speak(u);
+    });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
