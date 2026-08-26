@@ -1,77 +1,101 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#ff5a5f">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="いいね">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <link rel="manifest" href="manifest.webmanifest">
-  <title>いいね</title>
-  <style>
-    * { box-sizing: border-box; }
-    body { margin:0; min-height:100dvh; display:grid; place-items:center;
-      background:#f4f7fb; padding:24px;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
-    main { text-align:center; width:100%; }
-    h1 { font-size:30px; margin:0 0 28px; color:#222; }
-    .buttons { display:flex; flex-direction:column; align-items:center; gap:22px; }
-    button { width:min(78vw,330px); height:145px; border:0; border-radius:36px;
-      color:white; font-size:clamp(34px,9vw,48px); font-weight:800;
-      box-shadow:0 10px 24px rgba(0,0,0,.17); touch-action:manipulation; }
-    button:active { transform:scale(.96); }
-    #likeButton { background:#ff5a5f; }
-    #nandeButton { background:#4f73d9; }
-    p { margin-top:26px; font-size:17px; color:#555; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ff5a5f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="いいね">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<title>いいね</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100dvh;background:#f4f7fb;padding:22px 18px 34px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:420px;margin:0 auto;text-align:center}
+h1{font-size:29px;margin:10px 0 24px;color:#222}
+.buttons{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+button{min-height:135px;border:0;border-radius:32px;color:#fff;font-weight:800;font-size:clamp(25px,7vw,38px);box-shadow:0 9px 22px rgba(0,0,0,.17);-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+button:active{transform:scale(.96)}
+#likeButton{background:#ff5a5f}
+#nandeButton{background:#4f73d9;font-size:clamp(23px,6.6vw,35px)}
+#correctButton{background:#23a55a}
+#wrongButton{background:#555}
+.small{display:block;font-size:.48em;font-weight:700;margin-top:7px;opacity:.94}
+p{font-size:15px;color:#666;margin-top:22px}
+</style>
 </head>
 <body>
 <main>
-  <h1>いいねアプリ</h1>
-  <div class="buttons">
-    <button id="likeButton">いいね</button>
-    <button id="nandeButton">なんでやねん</button>
-  </div>
-  <p>ボタンを押すとしゃべります</p>
+<h1>いいねアプリ</h1>
+<div class="buttons">
+<button id="likeButton">いいね</button>
+<button id="nandeButton">なんでやねん</button>
+<button id="correctButton">正解<span class="small">ピンポン♪</span></button>
+<button id="wrongButton">不正解<span class="small">ブーー</span></button>
+</div>
+<p>ボタンを押すと音が鳴ります</p>
 </main>
 <script>
-function utter(text, rate, pitch) {
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'ja-JP';
-  u.rate = rate;
-  u.pitch = pitch;
-  u.volume = 1.0;
+function utter(text,rate,pitch){
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='ja-JP';u.rate=rate;u.pitch=pitch;u.volume=1;
   return u;
 }
-function ready() {
-  if (!('speechSynthesis' in window)) {
-    alert('この端末では音声読み上げに対応していません。');
-    return false;
-  }
-  speechSynthesis.cancel();
-  return true;
+function speechReady(){
+  if(!('speechSynthesis' in window)){alert('この端末では音声読み上げに対応していません。');return false;}
+  speechSynthesis.cancel(); return true;
 }
-document.getElementById('likeButton').onclick = () => {
-  if (!ready()) return;
-  speechSynthesis.speak(utter('いいねぇー', 1.12, 1.16));
+document.getElementById('likeButton').onclick=()=>{
+  if(!speechReady())return;
+  speechSynthesis.speak(utter('いいねぇー',1.12,1.16));
 };
-document.getElementById('nandeButton').onclick = () => {
-  if (!ready()) return;
-
-  // 希望の音程：なん＝低め、でや＝高め、ねん＝中くらい
-  // 分割間の不自然な間を減らすため、少し速めで連続再生。
-  const a = utter('なん', 1.22, 0.82);
-  const b = utter('でや', 1.25, 1.30);
-  const c = utter('ねん！', 1.20, 1.02);
-
-  speechSynthesis.speak(a);
-  speechSynthesis.speak(b);
-  speechSynthesis.speak(c);
+document.getElementById('nandeButton').onclick=()=>{
+  if(!speechReady())return;
+  speechSynthesis.speak(utter('なん',1.22,.82));
+  speechSynthesis.speak(utter('でや',1.25,1.30));
+  speechSynthesis.speak(utter('ねん！',1.20,1.02));
 };
-if ('serviceWorker' in navigator) {
-  addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+
+let audioCtx;
+function ctx(){
+  if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx.state==='suspended') audioCtx.resume();
+  return audioCtx;
+}
+function tone(freq,start,duration,volume,type){
+  const c=ctx(),o=c.createOscillator(),g=c.createGain();
+  o.type=type||'sine';
+  o.frequency.setValueAtTime(freq,c.currentTime+start);
+  g.gain.setValueAtTime(0.0001,c.currentTime+start);
+  g.gain.exponentialRampToValueAtTime(volume||0.28,c.currentTime+start+0.012);
+  g.gain.exponentialRampToValueAtTime(0.0001,c.currentTime+start+duration);
+  o.connect(g);g.connect(c.destination);
+  o.start(c.currentTime+start);o.stop(c.currentTime+start+duration+0.02);
+}
+function correctSound(){
+  ctx();
+  tone(784,0.00,0.20,0.28,'sine');
+  tone(1175,0.23,0.42,0.30,'sine');
+  tone(1568,0.00,0.16,0.08,'sine');
+  tone(2350,0.23,0.30,0.07,'sine');
+}
+function wrongSound(){
+  const c=ctx(),o=c.createOscillator(),g=c.createGain();
+  o.type='sawtooth';
+  o.frequency.setValueAtTime(165,c.currentTime);
+  o.frequency.linearRampToValueAtTime(145,c.currentTime+0.75);
+  g.gain.setValueAtTime(0.0001,c.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.20,c.currentTime+0.02);
+  g.gain.setValueAtTime(0.20,c.currentTime+0.62);
+  g.gain.exponentialRampToValueAtTime(0.0001,c.currentTime+0.82);
+  o.connect(g);g.connect(c.destination);
+  o.start();o.stop(c.currentTime+0.84);
+}
+document.getElementById('correctButton').onclick=correctSound;
+document.getElementById('wrongButton').onclick=wrongSound;
+if('serviceWorker' in navigator){
+  addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 }
 </script>
 </body>
