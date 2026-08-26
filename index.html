@@ -58,26 +58,47 @@
   </main>
 
   <script>
-    function speak(text, rate, pitch) {
-      if (!('speechSynthesis' in window)) {
-        alert('この端末では音声読み上げに対応していません。');
-        return;
-      }
-      speechSynthesis.cancel();
+    function makeUtterance(text, rate, pitch) {
       const u = new SpeechSynthesisUtterance(text);
       u.lang = 'ja-JP';
       u.rate = rate;
       u.pitch = pitch;
       u.volume = 1.0;
-      speechSynthesis.speak(u);
+      return u;
+    }
+
+    function speakOne(text, rate, pitch) {
+      if (!('speechSynthesis' in window)) {
+        alert('この端末では音声読み上げに対応していません。');
+        return;
+      }
+      speechSynthesis.cancel();
+      speechSynthesis.speak(makeUtterance(text, rate, pitch));
+    }
+
+    function speakKansai() {
+      if (!('speechSynthesis' in window)) {
+        alert('この端末では音声読み上げに対応していません。');
+        return;
+      }
+      speechSynthesis.cancel();
+
+      // 前半を少し高め、後半を少し低めにして、
+      // 「なん↗で、や↘ねん！」に近い勢いをつける
+      const first = makeUtterance('なんで', 1.18, 1.18);
+      const second = makeUtterance('やねん！', 1.15, 0.92);
+
+      speechSynthesis.speak(first);
+      speechSynthesis.speak(second);
     }
 
     document.getElementById('likeButton').addEventListener('click', () => {
-      speak('いいねぇー', 1.22, 1.18);
+      // 前回より少しだけゆっくり
+      speakOne('いいねぇー', 1.12, 1.16);
     });
 
     document.getElementById('nandeButton').addEventListener('click', () => {
-      speak('なんでやねん！', 1.24, 1.12);
+      speakKansai();
     });
 
     if ('serviceWorker' in navigator) {
